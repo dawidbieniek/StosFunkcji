@@ -19,7 +19,7 @@ void put_on_fun_stack(int par_level, char* fun_name)
 
 	if (element == NULL)
 	{
-		fprintf(stderr, "Nie mozna stworzyc stosu!");
+		fprintf(stderr, "Nie mozna stworzyc stosu!!!");
 		return;
 	}
 
