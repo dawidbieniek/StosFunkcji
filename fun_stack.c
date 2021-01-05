@@ -22,8 +22,7 @@ void put_on_fun_stack(int par_level, char* fun_name)
 		fprintf(stderr, "Nie mozna stworzyc stosu!!!");
 		return;
 	}
-	//sgfsgfsgsdfgsg
-	//sdfgsdfgdsfgsdfgsdfg
+
 	element->funname = fun_name;
 	element->par_level = par_level;
 	if (fun_stack == NULL)
