@@ -79,3 +79,7 @@ int alex_getLN()
 int isKeyword(char* ident)
 {
 }
+int test(void)
+{
+
+}
