@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "fun_stack.h"
 
 int main()

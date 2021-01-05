@@ -1,22 +1,22 @@
+#include <ctype.h>
+
 #include "alex.h"
 #include "fun_stack.h"
-
-#include <ctype.h>
 
 static int  ln = 0;
 static char ident[256];
 static FILE* ci = NULL;
 
-void alex_init4file(FILE* in) 
+void alex_init4file(FILE* in)
 {
 	ln = 0;
 	ci = in;
 }
 
-lexem_t alex_nextLexem(void) 
+lexem_t alex_nextLexem(void)
 {
 	int c;
-	while ((c = fgetc(ci)) != EOF) 
+	while ((c = fgetc(ci)) != EOF)
 	{
 		if (isspace(c))
 			continue;
@@ -30,7 +30,7 @@ lexem_t alex_nextLexem(void)
 			return OPEBRA;
 		else if (c == '}')
 			return CLOBRA;
-		else if (isalpha(c)) 
+		else if (isalpha(c))
 		{
 			int i = 1;
 			ident[0] = c;
@@ -39,25 +39,25 @@ lexem_t alex_nextLexem(void)
 			ident[i] = '\0';
 			return isKeyword(ident) ? OTHER : IDENT;
 		}
-		else if (c == '"') 
+		else if (c == '"')
 		{
 			/* Uwaga: tu trzeba jeszcze poprawic obsluge nowej linii w trakcie napisu
 			   i \\ w napisie
 			*/
 			int cp = c;
-			while ((c = fgetc(ci)) != EOF && c != '"' && cp == '\\') 
+			while ((c = fgetc(ci)) != EOF && c != '"' && cp == '\\')
 			{
 				cp = c;
 			}
 			return c == EOF ? EOFILE : OTHER;
 		}
-		else if (c == '/') 
+		else if (c == '/')
 		{
 			/* moze byc komentarz */
 		} if (isdigit(c) || c == '.') {
 			/* liczba */
 		}
-		else 
+		else
 		{
 			return OTHER;
 		}
@@ -65,12 +65,16 @@ lexem_t alex_nextLexem(void)
 	return EOFILE;
 }
 
-char* alex_ident(void) 
+char* alex_ident(void)
 {
 	return ident;
 }
 
-int alex_getLN() 
+int alex_getLN()
 {
 	return ln;
+}
+
+int isKeyword(char* ident)
+{
 }
