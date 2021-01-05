@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>		// exit - ale exit trzeba kiedyś usunąć i nie będzie to potrzebne
+
+#include "parser.h"
 #include "alex.h"       // analizator leksykalny
 #include "fun_stack.h"  // stos funkcji
 
-#define MAXINDENTLENGHT 256     // maks długość identyfikatora
-
 #pragma warning(disable : 4996) // 12: FILE* in = fopen(inpname, "r");
 
-void analizatorSkladni(char* inpname)
+void analizatorSkladni(char* inpname) 
 {                               // przetwarza plik inpname
 	FILE* in = fopen(inpname, "r");
 
@@ -51,7 +51,10 @@ void analizatorSkladni(char* inpname)
 												// za identyfikatorem znajdującym się na wierzchołku stosu
 				lexem_t nlex = alex_nextLexem();     // bierzemy nast leksem
 				if (nlex == OPEBRA)   // nast. leksem to klamra a więc mamy do czynienia z def. funkcji
+				{
 					store_add_def(get_from_fun_stack(), alex_getLN(), inpname);
+					nbra++;						// trzeba zwiekszyc nbra (program omija tu znak {)
+				}
 				else if (nbra == 0)   // nast. leksem to nie { i jesteśmy poza blokami - to musi być prototyp
 										// Bedzie dzialalo gdy { jest w nowej linii ???
 					store_add_proto(get_from_fun_stack(), alex_getLN(), inpname);
@@ -71,7 +74,7 @@ void analizatorSkladni(char* inpname)
 		{
 			fprintf(stderr, "\nBUUUUUUUUUUUUUUUUUUUUUU!\n"
 				"W pliku %s (linia %d) są błędy składni.\n"
-				"Kończę!\n\n", inpname, alex_getNL());
+				"Kończę!\n\n", inpname, alex_getLN());
 			exit(1);               // to nie jest najlepsze, ale jest proste ;-)
 		}
 		break;

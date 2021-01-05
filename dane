@@ -1,0 +1,14 @@
+void fa(int t);
+
+int main()
+{
+	int tetet = 0;
+	fa(tetet);
+	fa(tetet);
+	printf();
+}
+
+void fa(int t)
+{
+return;
+}

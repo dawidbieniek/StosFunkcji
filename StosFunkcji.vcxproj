@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClCompile Include="alex.c" />
     <ClCompile Include="fun_stack.c" />
+    <ClCompile Include="main.c" />
     <ClCompile Include="parser.c" />
     <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alex.h" />
     <ClInclude Include="fun_stack.h" />
+    <ClInclude Include="parser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

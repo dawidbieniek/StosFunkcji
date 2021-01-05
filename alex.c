@@ -1,27 +1,31 @@
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "alex.h"
 #include "fun_stack.h"
 
-static int  ln = 0;
+static int ln = 0;
 static char ident[256];
 static FILE* ci = NULL;
 
 void alex_init4file(FILE* in)
 {
-	ln = 0;
+	ln = 1;
 	ci = in;
 }
 
 lexem_t alex_nextLexem(void)
 {
-	int c;
+	char c;
 	while ((c = fgetc(ci)) != EOF)
 	{
 		if (isspace(c))
+		{
+			if (c == '\n')
+				ln++;
 			continue;
-		else if (c == '\n')
-			ln++;
+		}
 		else if (c == '(')
 			return OPEPAR;
 		else if (c == ')')
@@ -37,6 +41,7 @@ lexem_t alex_nextLexem(void)
 			while (isalnum(c = fgetc(ci)))
 				ident[i++] = c;
 			ident[i] = '\0';
+			fseek(ci, -1, SEEK_CUR);	// Cofniecie o 1 pozycje do tylu (jesli tego nie ma to omija znaki)
 			return isKeyword(ident) ? OTHER : IDENT;
 		}
 		else if (c == '"')
@@ -78,4 +83,8 @@ int alex_getLN()
 
 int isKeyword(char* ident)
 {
+	if (strcmp(ident, "void") == 0) return 1;
+	if (strcmp(ident, "int") == 0) return 1;
+	if (strcmp(ident, "return") == 0) return 1;
+	return 0;
 }
