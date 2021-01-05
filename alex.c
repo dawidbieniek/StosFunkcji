@@ -54,7 +54,8 @@ lexem_t alex_nextLexem(void)
 		else if (c == '/')
 		{
 			/* moze byc komentarz */
-		} if (isdigit(c) || c == '.') {
+		} if (isdigit(c) || c == '.') 
+		{
 			/* liczba */
 		}
 		else
