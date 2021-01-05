@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "fun_stack.h"
 
+#pragma warning(disable : 4996)
 static struct stack* fun_stack;
 
 int top_of_fun_stack(void)
@@ -23,7 +25,10 @@ void put_on_fun_stack(int par_level, char* fun_name)
 		return;
 	}
 
-	element->funname = fun_name;
+	element->funname = malloc(sizeof(char) * strlen(fun_name));
+	if (element->funname != NULL)
+		strcpy(element->funname, fun_name);
+
 	element->par_level = par_level;
 	if (fun_stack == NULL)
 		element->next = NULL;
