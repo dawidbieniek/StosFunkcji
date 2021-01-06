@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "parser.h"
-#pragma warning(disable : 4996)
 
+#pragma warning(disable : 4996)
 
 char** nazwy;				// lista nazw funkcji
 int ileNazw = 0;			// liczba nazw w liscie
@@ -17,6 +17,7 @@ struct FuncInfo
 } typedef funcInfo;
 
 static funcInfo def[256];
+//static funcInfo* def;
 static int ileDef = 0;
 static funcInfo proto[256];
 static int ileProto = 0;
@@ -59,6 +60,40 @@ void dodajNazwe(char* nazwa)
 
 void store_add_def(char* nazwa, int linia, char* plik)
 {
+	//if (def == NULL)								// rezerwuje pamiec, gdy lista jest pusta
+	//{
+	//	def = malloc(sizeof(funcInfo));
+	//	if (def == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+	//	{
+	//		fprintf(stderr, "Nie mozna stworzyc listy definicji!!!");
+	//		return;
+	//	}
+	//}
+	//else
+	//{
+	//	funcInfo* tmp = realloc(def, sizeof(funcInfo) * (ileDef + 1));
+	//	if (tmp != NULL)
+	//		def = tmp;
+	//	else										// nie udalo sie zarezerwowac pamieci -> error
+	//	{
+	//		fprintf(stderr, "Nie mozna dodac definicji do listy!!!");
+	//		return;
+	//	}
+	//}
+
+	//def[ileDef].nazwa = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do elementu
+	//if (def[ileDef].nazwa != NULL)
+	//	strcpy(def[ileDef].nazwa, nazwa);
+
+	//def[ileDef].plik = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy pliku do elementu
+	//if (def[ileDef].plik != NULL)
+	//	strcpy(def[ileDef].plik, plik);
+
+	//def[ileDef++].linia = linia;
+
+	//dodajNazwe(nazwa);
+
+
 	if (ileDef > 255)
 	{
 		fprintf(stderr, "Przekroczono pojemnosc zbiornika na definicje funkcji!");
@@ -78,6 +113,7 @@ void store_add_def(char* nazwa, int linia, char* plik)
 	ileDef++;
 
 	dodajNazwe(nazwa);
+
 }
 
 void store_add_proto(char* nazwa, int linia, char* plik)

@@ -7,6 +7,9 @@ funkcja(avc);
 ff(f());
 }
 
+// test dzialania ignorowania komentarzy()
+
+
 void ff(int d)
 {
 f();
