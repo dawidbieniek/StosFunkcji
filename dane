@@ -1,10 +1,11 @@
 void fa(int t);
+int fb();
 
 int main()
 {
 	int tetet = 0;
 	fa(tetet);
-	fa(tetet);
+	fa(fb());
 	printf();
 }
 

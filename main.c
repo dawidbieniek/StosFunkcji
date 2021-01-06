@@ -5,99 +5,123 @@
 #include "parser.h"
 #pragma warning(disable : 4996)
 
-static char nazwy[256][32];
-int ind = 0;
-// TODO: Zmienic na jakas liste 
+
+char** nazwy;				// lista nazw funkcji
+int ileNazw = 0;			// liczba nazw w liscie
+
 struct FuncInfo
 {
 	char* nazwa;
 	int linia;
 	char* plik;
-} typedef info;
+} typedef funcInfo;
 
-static info def[256];
-static defInd = 0;
-static info proto[256];
-static protoInd = 0;
-static info call[256];
-static callInd = 0;
+static funcInfo def[256];
+static int ileDef = 0;
+static funcInfo proto[256];
+static int ileProto = 0;
+static funcInfo call[256];
+static int ileCall = 0;
 
 void dodajNazwe(char* nazwa)
 {
-	for (int i = 0; i < ind; i++)
+	if (nazwy == NULL)								// rezerwuje pamiec, gdy lista jest pusta
 	{
-		if (strcmp(nazwy[i], nazwa) == 0)
+		nazwy = malloc(sizeof(char*));
+		if (nazwy == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna stworzyc listy nazw!!!");
 			return;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < ileNazw; i++)			// jezeli nazwa juz wystepuje w liscie, wyjdz z funkcji
+		{
+			if (strcmp(nazwy[i], nazwa) == 0)
+				return;
+		}
+
+		char** tmp = realloc(nazwy, sizeof(char*) * (ileNazw + 1));	
+		if (tmp != NULL)
+			nazwy = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac nazwy do listy!!!");
+			return;
+		}
 	}
 
-	strcpy(nazwy[ind++], nazwa);
+	nazwy[ileNazw] = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do listy
+	if (nazwy[ileNazw] != NULL)
+		strcpy(nazwy[ileNazw++], nazwa);
 }
 
-store_add_def(char* nazwa, int linia, char* plik)
+void store_add_def(char* nazwa, int linia, char* plik)
 {
-	if (defInd > 255)
+	if (ileDef > 255)
 	{
 		fprintf(stderr, "Przekroczono pojemnosc zbiornika na definicje funkcji!");
 		return;
 	}
 
-	def[defInd].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
-	if (def[defInd].nazwa != NULL)
-		strcpy(def[defInd].nazwa, nazwa);
+	def[ileDef].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
+	if (def[ileDef].nazwa != NULL)
+		strcpy(def[ileDef].nazwa, nazwa);
 
-	def[defInd].linia = linia;
+	def[ileDef].linia = linia;
 
-	def[defInd].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
-	if (def[defInd].plik != NULL)
-		strcpy(def[defInd].plik, plik);
+	def[ileDef].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
+	if (def[ileDef].plik != NULL)
+		strcpy(def[ileDef].plik, plik);
 
-	defInd++;
+	ileDef++;
 
 	dodajNazwe(nazwa);
 }
 
-store_add_proto(char* nazwa, int linia, char* plik)
+void store_add_proto(char* nazwa, int linia, char* plik)
 {
-	if (protoInd > 255)
+	if (ileProto > 255)
 	{
 		fprintf(stderr, "Przekroczono pojemnosc zbiornika na protoinicje funkcji!");
 		return;
 	}
 
-	proto[protoInd].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
-	if (proto[protoInd].nazwa != NULL)
-		strcpy(proto[protoInd].nazwa, nazwa);
+	proto[ileProto].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
+	if (proto[ileProto].nazwa != NULL)
+		strcpy(proto[ileProto].nazwa, nazwa);
 
-	proto[protoInd].linia = linia;
+	proto[ileProto].linia = linia;
 
-	proto[protoInd].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
-	if (proto[protoInd].plik != NULL)
-		strcpy(proto[protoInd].plik, plik);
+	proto[ileProto].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
+	if (proto[ileProto].plik != NULL)
+		strcpy(proto[ileProto].plik, plik);
 
-	protoInd++;
+	ileProto++;
 
 	dodajNazwe(nazwa);
 }
 
-store_add_call(char* nazwa, int linia, char* plik)
+void store_add_call(char* nazwa, int linia, char* plik)
 {
-	if (callInd > 255)
+	if (ileCall > 255)
 	{
 		fprintf(stderr, "Przekroczono pojemnosc zbiornika na callinicje funkcji!");
 		return;
 	}
 
-	call[callInd].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
-	if (call[callInd].nazwa != NULL)
-		strcpy(call[callInd].nazwa, nazwa);
+	call[ileCall].nazwa = malloc(sizeof(char) * strlen(nazwa));	// Kopiowanie nazwy funkcji
+	if (call[ileCall].nazwa != NULL)
+		strcpy(call[ileCall].nazwa, nazwa);
 
-	call[callInd].linia = linia;
+	call[ileCall].linia = linia;
 
-	call[callInd].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
-	if (call[callInd].plik != NULL)
-		strcpy(call[callInd].plik, plik);
+	call[ileCall].plik = malloc(sizeof(char) * strlen(plik));		// Kopiowanie nazwy pliku
+	if (call[ileCall].plik != NULL)
+		strcpy(call[ileCall].plik, plik);
 
-	callInd++;
+	ileCall++;
 
 	dodajNazwe(nazwa);
 }
@@ -126,23 +150,23 @@ int main(int argc, char* argv[])
 		printf("%s\n%d\n%s\n\n", call[i].nazwa, call[i].linia, call[i].plik);*/
 
 
-	for (int j = 0; j < ind; j++)
+	for (int j = 0; j < ileNazw; j++)
 	{
 		printf("\n%s\n", nazwy[j]);
 		printf("Definicje: \n");
-		for (int i = 0; i < defInd; i++)
+		for (int i = 0; i < ileDef; i++)
 		{
 			if (strcmp(def[i].nazwa, nazwy[j]) == 0)
 				printf("\tplik: %s linia: %d\n", def[i].plik, def[i].linia);
 		}
 		printf("Prototypy: \n");
-		for (int i = 0; i < protoInd; i++)
+		for (int i = 0; i < ileProto; i++)
 		{
 			if (strcmp(proto[i].nazwa, nazwy[j]) == 0)
 				printf("\tplik: %s linia: %d\n", proto[i].plik, proto[i].linia);
 		}
 		printf("Wywolania: \n");
-		for (int i = 0; i < callInd; i++)
+		for (int i = 0; i < ileCall; i++)
 		{
 			if (strcmp(call[i].nazwa, nazwy[j]) == 0)
 				printf("\tplik: %s linia: %d\n", call[i].plik, call[i].linia);

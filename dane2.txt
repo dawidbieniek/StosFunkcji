@@ -1,0 +1,13 @@
+void ff();
+int f();
+
+int main()
+{
+funkcja(avc);
+ff(f());
+}
+
+void ff(int d)
+{
+f();
+}
