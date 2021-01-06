@@ -50,23 +50,31 @@ lexem_t alex_nextLexem(void)
 			}
 			else if (c == '"')
 			{
-				/* Uwaga: tu trzeba jeszcze poprawic obsluge nowej linii w trakcie napisu
-				   i \\ w napisie
-				*/
-				int cp = c;
-				while ((c = fgetc(ci)) != EOF && c != '"' && cp == '\\')
+				while ((c = fgetc(ci)) != '"')	// ignoruj znaki do napotkania "
 				{
-					cp = c;
+					if (c == '\n')
+						ln++;
+					else if (c == EOF)
+						return EOFILE;
 				}
-				return c == EOF ? EOFILE : OTHER;
+			}
+			else if (c == '\'')
+			{
+				while ((c = fgetc(ci)) != '\'')	// ignoruj znaki do napotkania '
+				{
+					if (c == '\n')
+						ln++;
+					else if (c == EOF)
+						return EOFILE;
+				}
 			}
 			else if (c == '/')
 			{
 				if ((c = fgetc(ci)) != EOF)
 				{
-					if (c == '/')
+					if (c == '/')				// komentarz liniowy
 						ignore = 1;
-					else if (c == '*')
+					else if (c == '*')			// komentarz blokowy
 						ignore = 2;
 				}
 				else
@@ -74,7 +82,7 @@ lexem_t alex_nextLexem(void)
 			}
 			else if (isdigit(c) || c == '.')
 			{
-				/* liczba */
+				continue;			// dla czytelnosci
 			}
 			else
 			{

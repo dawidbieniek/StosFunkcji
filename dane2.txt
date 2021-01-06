@@ -7,7 +7,16 @@ funkcja(avc);
 ff(f());
 }
 
-// test dzialania ignorowania komentarzy()
+'\n'
+f('\n');
+
+"tekst()
+test()
+{
+}
+
+
+ drugi"
 
 
 void ff(int d)
