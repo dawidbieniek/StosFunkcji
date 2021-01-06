@@ -9,8 +9,6 @@ static int ln = 0;
 static char ident[256];
 static FILE* ci = NULL;
 
-static int ignore = 0;		// 0 - analizuj znaki; 1 - ignoruj do napotkania \n; 2 - ignoruj do napotkana */ 
-
 void alex_init4file(FILE* in)
 {
 	ln = 1;
@@ -22,8 +20,6 @@ lexem_t alex_nextLexem(void)
 	char c;
 	while ((c = fgetc(ci)) != EOF)
 	{
-		if (ignore == 0)			// analizuj znaki
-		{
 			if (isspace(c))
 			{
 				if (c == '\n')
@@ -73,9 +69,23 @@ lexem_t alex_nextLexem(void)
 				if ((c = fgetc(ci)) != EOF)
 				{
 					if (c == '/')				// komentarz liniowy
-						ignore = 1;
+					{
+						while ((c = fgetc(ci)) != '\n')
+						{
+							if (c == EOF)
+								return EOFILE;
+						}
+					}
 					else if (c == '*')			// komentarz blokowy
-						ignore = 2;
+					{
+						while (!((c = fgetc(ci)) == '*' && (c= fgetc(ci)) == '/'))	// pobierze 2 znaki tylko jezeli 1 bedzie '*' (short cirtuit AND)
+						{
+							if (c == '\n')
+								ln++;
+							else if (c == EOF)
+								return EOFILE;
+						}
+					}
 				}
 				else
 					return EOFILE;
@@ -88,25 +98,6 @@ lexem_t alex_nextLexem(void)
 			{
 				return OTHER;
 			}
-		}
-		else if (ignore == 1)		// ignoruj do napotkania \n
-		{
-			if (c == '\n')
-				ignore = 0;
-		}
-		else if (ignore == 2)		// ignoruj do napotkania */
-		{
-			if (c == '*')
-			{
-				if ((c = fgetc(ci)) != EOF)
-				{
-					if (c == '/')
-						ignore = 0;
-				}
-				else
-					return EOFILE;
-			}
-		}
 	}
 	return EOFILE;
 }

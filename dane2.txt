@@ -6,20 +6,12 @@ int main()
 funkcja(avc);
 ff(f());
 }
-
-'\n'
-f('\n');
-
-"tekst()
-test()
-{
-}
-
-
- drugi"
-
-
+/*
+komentarze()
+// zagniezdzoby komentarz()
+*/
+/**/
 void ff(int d)
 {
 f();
-}
+} "
