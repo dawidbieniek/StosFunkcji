@@ -34,11 +34,11 @@ lexem_t alex_nextLexem(void)
 				return OPEBRA;
 			else if (c == '}')
 				return CLOBRA;
-			else if (isalpha(c))
+			else if (isalpha(c) || c == '_')
 			{
 				int i = 1;
 				ident[0] = c;
-				while (isalnum(c = fgetc(ci)))
+				while (isalnum(c = fgetc(ci)) || c == '_' || isdigit(c))
 					ident[i++] = c;
 				ident[i] = '\0';
 				fseek(ci, -1, SEEK_CUR);	// Cofniecie o 1 pozycje do tylu (jesli tego nie ma to omija znaki)
@@ -64,7 +64,7 @@ lexem_t alex_nextLexem(void)
 						return EOFILE;
 				}
 			}
-			else if (c == '/')
+			else if (c == '/')					// komentarze
 			{
 				if ((c = fgetc(ci)) != EOF)
 				{
@@ -75,6 +75,7 @@ lexem_t alex_nextLexem(void)
 							if (c == EOF)
 								return EOFILE;
 						}
+						ln++;
 					}
 					else if (c == '*')			// komentarz blokowy
 					{
@@ -89,6 +90,15 @@ lexem_t alex_nextLexem(void)
 				}
 				else
 					return EOFILE;
+			}
+			else if (c == '#')					// preprocesory
+			{
+				while ((c = fgetc(ci)) != '\n')	// ignorowanie tekstu do znaku \n
+				{
+					if (c == EOF)
+						return EOFILE;
+				}
+				ln++;
 			}
 			else if (isdigit(c) || c == '.')
 			{

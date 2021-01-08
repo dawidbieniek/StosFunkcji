@@ -64,11 +64,7 @@ void analizatorSkladni(char* inpname)
 										// Bedzie dzialalo gdy { jest w nowej linii ???
 					store_add_proto(get_from_fun_stack(), alex_getLN(), inpname);
 				else                  // nast. leksem to nie { i jesteśmy wewnątrz bloku - to zapewne wywołanie
-				{
-					char* nazwa = get_from_fun_stack();
-					store_add_call(nazwa, alex_getLN(), inpname);
-					store_add_use(nazwa);
-				}
+					store_add_call(get_from_fun_stack(), alex_getLN(), inpname);
 			}
 			npar--;
 		}
