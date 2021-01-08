@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include "printer.h"
+#include "kontener.h"
 
 int main(int argc, char* argv[])
 {
@@ -12,8 +13,7 @@ int main(int argc, char* argv[])
 	for (int i = 1; i < argc; i++)
 		analizatorSkladni(argv[i]);
 
-	Wypisz();
-	getch();
+	wypisz();
 
 	return 0;
 }

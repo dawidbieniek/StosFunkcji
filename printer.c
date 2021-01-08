@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "printer.h"
 
 #include "kontener.h"
 
-void Wypisz()
+void wypisz()
 {
 	for (int j = 0; j < ileNazw; j++)
 	{

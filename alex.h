@@ -1,6 +1,8 @@
 #ifndef _ALEX_H_IS_INCLUDED_
 #define _ALEX_H_IS_INCLUDED_
 
+#include <stdio.h>
+
 // interesujące leksemy: błąd, inny symbol, koniec pliku, otwierająca klamra {,
 //                       zamykająca klamra }, identyfikator, otwierający nawias,
 //                       zamykający nawias
