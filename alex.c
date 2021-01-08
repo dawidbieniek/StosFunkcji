@@ -1,8 +1,10 @@
-#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "alex.h"
+
 #include "fun_stack.h"
 
 static int ln = 0;

@@ -4,7 +4,7 @@
 
 #include "fun_stack.h"
 
-#pragma warning(disable : 4996)
+#pragma warning(disable : 4996)		// strcpy
 
 static struct stack* fun_stack;		// stos funkcji
 

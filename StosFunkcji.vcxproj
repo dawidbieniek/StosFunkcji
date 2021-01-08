@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="alex.c" />
     <ClCompile Include="fun_stack.c" />
+    <ClCompile Include="kontener.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="parser.c" />
     <ClCompile Include="printer.c" />
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="alex.h" />
     <ClInclude Include="fun_stack.h" />
+    <ClInclude Include="kontener.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="printer.h" />
   </ItemGroup>

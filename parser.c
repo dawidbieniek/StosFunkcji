@@ -2,13 +2,15 @@
 #include <stdlib.h>		// exit - ale exit trzeba kiedyś usunąć i nie będzie to potrzebne
 
 #include "parser.h"
+
 #include "alex.h"       // analizator leksykalny
 #include "fun_stack.h"  // stos funkcji
+#include "kontener.h"
 
-#pragma warning(disable : 4996) // 12: FILE* in = fopen(inpname, "r");
+#pragma warning(disable : 4996) // fopen
 
-void analizatorSkladni(char* inpname) 
-{                               // przetwarza plik inpname
+void analizatorSkladni(char* inpname)	// przetwarza plik inpname
+{                               
 	FILE* in = fopen(inpname, "r");
 	if (in == NULL)
 	{
@@ -20,7 +22,7 @@ void analizatorSkladni(char* inpname)
 	int npar = 0;   // bilans nawiasów zwykłych ()
 
 	alex_init4file(in);          // ustaw analizator leksykalny, aby czytał in
-
+	
 	lexem_t lex;
 
 	lex = alex_nextLexem();      // pobierz następny leksem
