@@ -1,91 +1,207 @@
+#include <stdlib.h>
 #include <stdio.h>
-#include <stdlib.h>		// exit - ale exit trzeba kiedyś usunąć i nie będzie to potrzebne
+#include <string.h>
 
-#include "parser.h"
-#include "alex.h"       // analizator leksykalny
-#include "fun_stack.h"  // stos funkcji
+#include "kontener.h"
 
-#pragma warning(disable : 4996) // 12: FILE* in = fopen(inpname, "r");
+#pragma warning(disable : 26451)	// przepelnienie inta
 
-void analizatorSkladni(char* inpname) 
-{                               // przetwarza plik inpname
-	FILE* in = fopen(inpname, "r");
-	if (in == NULL)
+void store_init()
+{
+	ileNazw = 0;
+	ileDef = 0;
+	ileProto = 0;
+	ileCall = 0;
+	ileUse = 0;
+}
+
+void dodajNazwe(char* nazwa)
+{
+	if (nazwy == NULL)								// rezerwuje pamiec, gdy lista jest pusta
 	{
-		fprintf(stderr, "Nie mozna otworzyc pliku %s!!!", inpname);
-		return;
+		nazwy = malloc(sizeof(char*));
+		if (nazwy == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna stworzyc listy nazw!!!");
+			return;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < ileNazw; i++)			// jezeli nazwa juz wystepuje w liscie, wyjdz z funkcji
+		{
+			if (strcmp(nazwy[i], nazwa) == 0)
+				return;
+		}
+
+		char** tmp = realloc(nazwy, sizeof(char*) * (ileNazw + 1));
+		if (tmp != NULL)
+			nazwy = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac nazwy do listy!!!");
+			return;
+		}
 	}
 
-	int nbra = 0;   // bilans nawiasów klamrowych {}
-	int npar = 0;   // bilans nawiasów zwykłych ()
+	nazwy[ileNazw] = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do listy
+	if (nazwy[ileNazw] != NULL)
+		strcpy(nazwy[ileNazw++], nazwa);
+}
 
-	alex_init4file(in);          // ustaw analizator leksykalny, aby czytał in
-
-	lexem_t lex;
-
-	lex = alex_nextLexem();      // pobierz następny leksem
-	while (lex != EOFILE)
+void store_add_def(char* nazwa, int linia, char* plik)
+{
+	if (def == NULL)								// rezerwuje pamiec, gdy lista jest pusta
 	{
-		switch (lex)
+		def = malloc(sizeof(funcInfo));
+		if (def == NULL)							// nie udalo sie zarezerwowac pamieci -> error
 		{
-		case IDENT:
-		{
-			char* iname = alex_ident();			// zapamiętaj identyfikator i patrz co dalej
-			lexem_t nlex = alex_nextLexem();	// nawias otwierający - to zapewne funkcja
-			if (nlex == OPEPAR)
-			{
-				npar++;
-				put_on_fun_stack(npar, iname);        // odłóż na stos funkcji
-													  // stos f. jest niezbędny, aby poprawnie obsłużyć sytuacje typu
-													  // f1( 5, f2( a ), f3( b ) )
-			}
-			else								// nie nawias, czyli nie funkcja
-			{
-				lex = nlex;
-				continue;
-			}
+			fprintf(stderr, "Nie mozna stworzyc listy definicji!!!");
+			return;
 		}
-		break;
-		case OPEPAR:
-			npar++;
-			break;
-		case CLOPAR:							// zamykający nawias - to może być koniec prototypu, nagłówka albo wywołania
-		{
-			if (top_of_fun_stack() == npar)		// sprawdzamy, czy liczba nawiasów bilansuje się z wierzchołkiem stosu funkcji
-			{									// jeśli tak, to właśnie wczytany nawias jest domknięciem nawiasu otwartego
-												// za identyfikatorem znajdującym się na wierzchołku stosu
-				lexem_t nlex = alex_nextLexem();     // bierzemy nast leksem
-				if (nlex == OPEBRA)   // nast. leksem to klamra a więc mamy do czynienia z def. funkcji
-				{
-					store_add_def(get_from_fun_stack(), alex_getLN(), inpname);
-					nbra++;						// trzeba zwiekszyc nbra (program omija tu znak {)
-				}
-				else if (nbra == 0)   // nast. leksem to nie { i jesteśmy poza blokami - to musi być prototyp
-										// Bedzie dzialalo gdy { jest w nowej linii ???
-					store_add_proto(get_from_fun_stack(), alex_getLN(), inpname);
-				else                  // nast. leksem to nie { i jesteśmy wewnątrz bloku - to zapewne wywołanie
-					store_add_call(get_from_fun_stack(), alex_getLN(), inpname);
-			}
-			npar--;
-		}
-		break;
-		case OPEBRA:
-			nbra++;
-			break;
-		case CLOBRA:
-			nbra--;
-			break;
-		case ERROR:
-		{
-			fprintf(stderr, "\nBUUUUUUUUUUUUUUUUUUUUUU!\n"
-				"W pliku %s (linia %d) są błędy składni.\n"
-				"Kończę!\n\n", inpname, alex_getLN());
-			exit(1);               // to nie jest najlepsze, ale jest proste ;-)
-		}
-		break;
-		default:
-			break;
-		}
-		lex = alex_nextLexem();
 	}
+	else
+	{
+		funcInfo* tmp = realloc(def, sizeof(funcInfo) * (ileDef + 1));
+		if (tmp != NULL)
+			def = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac definicji do listy!!!");
+			return;
+		}
+	}
+
+	def[ileDef].nazwa = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do elementu
+	if (def[ileDef].nazwa != NULL)
+		strcpy(def[ileDef].nazwa, nazwa);
+
+	def[ileDef].plik = malloc(sizeof(char) * strlen(plik));	// dodawanie nazwy pliku do elementu
+	if (def[ileDef].plik != NULL)
+		strcpy(def[ileDef].plik, plik);
+
+	def[ileDef++].linia = linia;
+
+	ostatniaNazwaDefinicji = malloc(sizeof(char) * strlen(nazwa));	// zapisywanie nazwy definicji
+	if (ostatniaNazwaDefinicji != NULL)
+		strcpy(ostatniaNazwaDefinicji, nazwa);
+
+	dodajNazwe(nazwa);
+}
+
+void store_add_proto(char* nazwa, int linia, char* plik)
+{
+	if (proto == NULL)								// rezerwuje pamiec, gdy lista jest pusta
+	{
+		proto = malloc(sizeof(funcInfo));
+		if (proto == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna stworzyc listy prototypow!!!");
+			return;
+		}
+	}
+	else
+	{
+		funcInfo* tmp = realloc(proto, sizeof(funcInfo) * (ileProto + 1));
+		if (tmp != NULL)
+			proto = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac prototypu do listy!!!");
+			return;
+		}
+	}
+
+	proto[ileProto].nazwa = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do elementu
+	if (proto[ileProto].nazwa != NULL)
+		strcpy(proto[ileProto].nazwa, nazwa);
+
+	proto[ileProto].plik = malloc(sizeof(char) * strlen(plik));	// dodawanie nazwy pliku do elementu
+	if (proto[ileProto].plik != NULL)
+		strcpy(proto[ileProto].plik, plik);
+
+	proto[ileProto++].linia = linia;
+
+	dodajNazwe(nazwa);
+}
+
+void store_add_call(char* nazwa, int linia, char* plik)
+{
+	if (call == NULL)								// rezerwuje pamiec, gdy lista jest pusta
+	{
+		call = malloc(sizeof(funcInfo));
+		if (call == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna stworzyc listy wywolan!!!");
+			return;
+		}
+	}
+	else
+	{
+		funcInfo* tmp = realloc(call, sizeof(funcInfo) * (ileCall + 1));
+		if (tmp != NULL)
+			call = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac wywolania do listy!!!");
+			return;
+		}
+	}
+
+	call[ileCall].nazwa = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy do elementu
+	if (call[ileCall].nazwa != NULL)
+		strcpy(call[ileCall].nazwa, nazwa);
+
+	call[ileCall].plik = malloc(sizeof(char) * strlen(plik));	// dodawanie nazwy pliku do elementu
+	if (call[ileCall].plik != NULL)
+		strcpy(call[ileCall].plik, plik);
+
+	call[ileCall++].linia = linia;
+
+	dodajNazwe(nazwa);
+}
+
+void store_add_use(char* nazwa)		// lista call wykorzystuje strukture funcInfo do przechowywania nazw (lepiej bylo by uzyc nowej struktury)
+{
+	if (use == NULL)								// rezerwuje pamiec, gdy lista jest pusta
+	{
+		use = malloc(sizeof(funcInfo));
+		if (use == NULL)							// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna stworzyc listy uzyc!!!");
+			return;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < ileUse; i++)			// jezeli nazwa usytej funkcji juz wystepuje w liscie, dodaj liczbe wystapien
+		{
+			if (strcmp(use[i].plik, nazwa) == 0)
+			{
+				use[i].linia++;
+				return;
+			}
+		}
+
+		funcInfo* tmp = realloc(use, sizeof(funcInfo) * (ileUse + 1));
+		if (tmp != NULL)
+			use = tmp;
+		else										// nie udalo sie zarezerwowac pamieci -> error
+		{
+			fprintf(stderr, "Nie mozna dodac uzycia do listy!!!");
+			return;
+		}
+	}
+
+	use[ileUse].nazwa = malloc(sizeof(char) * strlen(ostatniaNazwaDefinicji));	// dodawanie nazwy do elementu
+	if (use[ileUse].nazwa != NULL)
+		strcpy(use[ileUse].nazwa, ostatniaNazwaDefinicji);
+
+	use[ileUse].plik = malloc(sizeof(char) * strlen(nazwa));	// dodawanie nazwy pliku do elementu
+	if (use[ileUse].plik != NULL)
+		strcpy(use[ileUse].plik, nazwa);
+
+	use[ileUse].linia = 1;
+
+	ileUse++;
 }

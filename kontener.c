@@ -5,6 +5,7 @@
 #include "kontener.h"
 
 #pragma warning(disable : 26451)	// przepelnienie inta
+#pragma warning(disable : 4996)	// przepelnienie inta
 
 void store_init()
 {
@@ -176,7 +177,7 @@ void store_add_use(char* nazwa)		// lista call wykorzystuje strukture funcInfo d
 	{
 		for (int i = 0; i < ileUse; i++)			// jezeli nazwa usytej funkcji juz wystepuje w liscie, dodaj liczbe wystapien
 		{
-			if (strcmp(use[i].plik, nazwa) == 0)
+			if (strcmp(use[i].plik, nazwa) == 0 && use[i].nazwa == ostatniaNazwaDefinicji)
 			{
 				use[i].linia++;
 				return;
